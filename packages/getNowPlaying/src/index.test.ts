@@ -1,25 +1,33 @@
 import { unstable_dev } from "wrangler";
-import type { UnstableDevWorker } from "wrangler";
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("Worker", () => {
-	let worker: UnstableDevWorker;
+	let worker: any;
 
 	beforeAll(async () => {
-		worker = await unstable_dev("src/index.ts", {
-			experimental: { disableExperimentalWarning: true },
-		});
+		worker = await unstable_dev(
+			"src/index.ts",
+			{},
+			{ disableExperimentalWarning: true }
+		);
 	});
 
 	afterAll(async () => {
 		await worker.stop();
-	});
+	})
 
-	it("should return Hello World", async () => {
+	const statusRegex = new RegExp(/(200)|(204)/);
+
+	const exampleResponse = {
+		"status": expect.stringMatching(statusRegex),
+		'response': expect.any(JSON)
+	}
+
+	it("Should return json or a 204 status code", async () => {
 		const resp = await worker.fetch();
 		if (resp) {
-			const text = await resp.text();
-			expect(text).toMatchInlineSnapshot(`"Hello World!"`);
+			const object = await resp.response();
+			expect(object).toMatchObject(exampleResponse);
 		}
-	});
-});
+	})
+})
