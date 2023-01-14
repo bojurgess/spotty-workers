@@ -6,5 +6,11 @@
   ],
   "devDependencies": {
     "lerna": "^6.4.1"
+  },
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "publish": "wrangler deploy",
+    "start": "wrangler dev",
+    "test": "vitest"
   }
 }

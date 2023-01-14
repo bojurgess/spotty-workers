@@ -22,7 +22,9 @@
 
 export default {
 	async fetch(
+		request: Request,
 		env: Env,
+		context: ExecutionContext,
 	): Promise<Response> {
 
 		const host = 'https://api.spotify.com/'; // Spotify API
@@ -53,9 +55,14 @@ export default {
 					status: response.status,
 					response: data
 				})
+			} else {
+				return JSON.stringify({
+					status: response.status,
+					response: response.statusText
+				})
 			}
 		}
-
+		
 		return new Response(await getCurrentlyPlaying(), init)
 	}
 }

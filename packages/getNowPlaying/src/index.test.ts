@@ -7,8 +7,7 @@ describe("Worker", () => {
 	beforeAll(async () => {
 		worker = await unstable_dev(
 			"src/index.ts",
-			{},
-			{ disableExperimentalWarning: true }
+			{ experimental: { disableExperimentalWarning: true } },
 		);
 	});
 
@@ -18,16 +17,12 @@ describe("Worker", () => {
 
 	const statusRegex = new RegExp(/(200)|(204)/);
 
-	const exampleResponse = {
-		"status": expect.stringMatching(statusRegex),
-		'response': expect.any(JSON)
-	}
-
 	it("Should return json or a 204 status code", async () => {
 		const resp = await worker.fetch();
+
 		if (resp) {
-			const object = await resp.response();
-			expect(object).toMatchObject(exampleResponse);
+			const object = await resp.json();
+			expect(object.status).toMatch(statusRegex)
 		}
 	})
 })
