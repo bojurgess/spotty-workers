@@ -36,6 +36,7 @@ export default {
 		const init = {
 			headers: {
 				'content-type': 'application/json;charset=UTF-8',
+				'Access-Control-Allow-Origin': '*',
 			}
 		}
 
