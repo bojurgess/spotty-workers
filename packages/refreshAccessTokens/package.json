@@ -1,0 +1,13 @@
+{
+  "name": "refreshaccesstokens",
+  "version": "0.0.0",
+  "devDependencies": {
+    "wrangler": "2.7.1"
+  },
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev",
+    "deploy": "wrangler publish",
+    "test": "vitest"
+  }
+}
