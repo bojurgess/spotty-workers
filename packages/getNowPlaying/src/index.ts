@@ -8,7 +8,7 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-export interface Env {
+ export interface Env {
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 	// MY_KV_NAMESPACE: KVNamespace;
 	//
@@ -17,14 +17,45 @@ export interface Env {
 	//
 	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
 	// MY_BUCKET: R2Bucket;
+	SPOTIFY_TOKEN: string;
 }
 
 export default {
 	async fetch(
-		request: Request,
 		env: Env,
-		ctx: ExecutionContext
 	): Promise<Response> {
-		return new Response("Hello World!");
-	},
-};
+
+		const host = 'https://api.spotify.com/'; // Spotify API
+		const endpoint = 'v1/me/player/currently-playing'; // Endpoint
+		const token = env.SPOTIFY_TOKEN; // Spotify token
+
+		const init = {
+			headers: {
+				'content-type': 'application/json;charset=UTF-8',
+			}
+		}
+
+		const getCurrentlyPlaying = async () => {
+			const response = await fetch(`${host}${endpoint}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+		
+			if(response.status === 204) {
+				return JSON.stringify({
+					status: response.status,
+					response: 'nothing playing...'
+				})
+			} else if (response.status === 200) {
+				const data = await response.json();
+				return JSON.stringify({
+					status: response.status,
+					response: data
+				})
+			}
+		}
+
+		return new Response(await getCurrentlyPlaying(), init)
+	}
+}
