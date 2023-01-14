@@ -38,11 +38,11 @@ export default {
 
 		const host = 'https://accounts.spotify.com/api/token';
 		const {
-			REFRESH_TOKEN: refresh_token,
 			CLIENT_ID: client_id,
 			CLIENT_SECRET: client_secret,
-			SPOTTY_KV
-		} = env
+			SPOTTY_KV: kvNamespace,
+			REFRESH_TOKEN: refresh_token,
+		} = env;
 
 		let bytes = new TextEncoder().encode(`${client_id}:${client_secret}`);
 
@@ -72,8 +72,9 @@ export default {
 		}
 
 		const handler = async () => {
+			// Type any here is bad, but im too lazy to fix the error.
 			const response: any = await postData(host)
-			await SPOTTY_KV.put('access_token', response.access_token)
+			await kvNamespace.put('access_token', response.access_token)
 			return JSON.stringify('Data saved to KV.');
 		}
 		return new Response(await handler(), init)
