@@ -9,6 +9,7 @@
  */
 
  export interface Env {
+	SPOTTY_KV: KVNamespace;
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 	// MY_KV_NAMESPACE: KVNamespace;
 	//
@@ -17,7 +18,6 @@
 	//
 	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
 	// MY_BUCKET: R2Bucket;
-	SPOTIFY_TOKEN: string;
 }
 
 export default {
@@ -29,7 +29,9 @@ export default {
 
 		const host = 'https://api.spotify.com/'; // Spotify API
 		const endpoint = 'v1/me/player/currently-playing'; // Endpoint
-		const token = env.SPOTIFY_TOKEN; // Spotify token
+		const kvNamespace = env.SPOTTY_KV; // KV Namespace
+
+		const token = await kvNamespace.get('access_token')
 
 		const init = {
 			headers: {
