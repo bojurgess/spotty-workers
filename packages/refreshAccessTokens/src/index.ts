@@ -72,7 +72,7 @@ export default {
 		}
 
 		const handler = async () => {
-			const response = await postData(host)
+			const response: any = await postData(host)
 			await SPOTTY_KV.put('access_token', response.access_token)
 			return JSON.stringify('Data saved to KV.');
 		}
