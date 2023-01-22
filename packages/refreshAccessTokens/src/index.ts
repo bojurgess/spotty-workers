@@ -23,60 +23,57 @@ export interface Env {
 	CLIENT_SECRET: string;
 }
 
-export default {
-	async fetch(
-		request: Request,
-		env: Env,
-		context: ExecutionContext,
-	): Promise<Response> {
-
-		const init = {
-			headers: {
-				'content-type': 'application/json;charset=UTF-8',
-			}
-		}
-
-		const host = 'https://accounts.spotify.com/api/token';
-		const {
-			CLIENT_ID: client_id,
-			CLIENT_SECRET: client_secret,
-			SPOTTY_KV: kvNamespace,
-			REFRESH_TOKEN: refresh_token,
-		} = env;
-
-		let bytes = new TextEncoder().encode(`${client_id}:${client_secret}`);
-
-		function bytes2base64(bytes: Uint8Array) {
-			let binary = '';
-			const len = bytes.byteLength;
-			for (let i = 0; i < len; i++) {
-				binary += String.fromCharCode(bytes[i]);
-			}
-			return btoa(binary);
-		}
-
-		const postData = async (url = '') => {
-			const response = await fetch(url, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					'Authorization': `Basic ${bytes2base64(bytes)}`,
-				},
-				body: new URLSearchParams({
-					grant_type: 'refresh_token',
-					refresh_token,
-				})
-			});
-			return response.json();
-
-		}
-
-		const handler = async () => {
-			// Type any here is bad, but im too lazy to fix the error.
-			const response: any = await postData(host)
-			await kvNamespace.put('access_token', response.access_token)
-			return JSON.stringify('Data saved to KV.');
-		}
-		return new Response(await handler(), init)
+const init = {
+	headers: {
+		'content-type': 'application/json;charset=UTF-8',
 	}
 }
+
+const host = 'https://accounts.spotify.com/api/token';
+
+function bytes2base64(bytes: Uint8Array) {
+	let binary = '';
+	const len = bytes.byteLength;
+	for (let i = 0; i < len; i++) {
+		binary += String.fromCharCode(bytes[i]);
+	}
+	return btoa(binary);
+}
+
+async function getSpotifyData(event: any, env: any) {  // Fetch some data  console.log('cron processed', event.scheduledTime);
+
+	const {
+		CLIENT_ID: client_id,
+		CLIENT_SECRET: client_secret,
+		SPOTTY_KV: kvNamespace,
+		REFRESH_TOKEN: refresh_token,
+	} = env;
+
+	let bytes = new TextEncoder().encode(`${client_id}:${client_secret}`);
+
+	const response = await fetch(host, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Authorization': `Basic ${bytes2base64(bytes)}`,
+		},
+		body: new URLSearchParams({
+			grant_type: 'refresh_token',
+			refresh_token,
+		}),
+	});
+
+	const data: any = await response.json();
+	console.log(data, refresh_token, client_id, client_secret, bytes2base64(bytes));
+	await kvNamespace.put('access_token', data.access_token)
+
+	console.log('cron processed', event.scheduledTime);
+	return data;
+}
+
+const worker = {  async scheduled(event: any, env: any, ctx: any) {
+		ctx.waitUntil(getSpotifyData(event, env));  
+	},
+};
+
+export default worker;
