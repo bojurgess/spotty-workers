@@ -33,11 +33,12 @@ export default {
 
 		const token = await kvNamespace.get('access_token')
 
-		const init = {
+		let init = {
 			headers: {
 				'content-type': 'application/json;charset=UTF-8',
 				'Access-Control-Allow-Origin': '*',
-			}
+			},
+			status: 200,
 		}
 
 		const getCurrentlyPlaying = async () => {
@@ -48,19 +49,19 @@ export default {
 			});
 		
 			if(response.status === 204) {
+				init.status = response.status
 				return JSON.stringify({
-					status: response.status,
 					response: 'nothing playing...'
 				})
 			} else if (response.status === 200) {
 				const data = await response.json();
+				init.status = response.status
 				return JSON.stringify({
-					status: response.status,
 					response: data
 				})
 			} else {
+				init.status = response.status
 				return JSON.stringify({
-					status: response.status,
 					response: response.statusText
 				})
 			}
