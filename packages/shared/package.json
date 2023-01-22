@@ -1,0 +1,26 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "description": "shared packages",
+  "author": "Joe Burgess <bojurgess@gmail.com>",
+  "homepage": "https://github.com/bojurgess/spotty-workers#readme",
+  "license": "ISC",
+  "main": "lib/shared.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bojurgess/spotty-workers.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/shared.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/bojurgess/spotty-workers/issues"
+  }
+}
