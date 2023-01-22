@@ -40,7 +40,7 @@ function bytes2base64(bytes: Uint8Array) {
 	return btoa(binary);
 }
 
-async function getSpotifyData(event: any, env: any) {  // Fetch some data  console.log('cron processed', event.scheduledTime);
+async function getSpotifyData(event: any, env: Env) {  // Fetch some data  console.log('cron processed', event.scheduledTime);
 
 	const {
 		CLIENT_ID: client_id,
