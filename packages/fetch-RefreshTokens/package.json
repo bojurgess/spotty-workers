@@ -1,6 +1,9 @@
 {
   "name": "fetch-refreshtokens",
   "version": "1.0.0",
+  "dependencies": {
+    "shared": "^1.0.0"
+  },
   "devDependencies": {
     "wrangler": "2.7.1"
   },

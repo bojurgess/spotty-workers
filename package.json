@@ -7,7 +7,7 @@
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "publish": "wrangler deploy",
+    "publish": "wrangler publish",
     "start": "wrangler dev",
     "test": "vitest"
   }
