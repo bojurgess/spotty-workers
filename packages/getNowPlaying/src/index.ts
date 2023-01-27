@@ -8,6 +8,8 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { l } from "vitest/dist/index-2dd51af4";
+
  export interface Env {
 	SPOTTY_KV: KVNamespace;
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -27,11 +29,31 @@ export default {
 		context: ExecutionContext,
 	): Promise<Response> {
 
+		const url = request.url
+
+		function getParameterByName(name: string) {
+			name = name.replace(/[\[\]]/g, '\\$&')
+			name = name.replace(/\//g, '')
+			var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+				results = regex.exec(url)
+	
+			if (!results) return null
+			else if (!results[2]) return ''
+			else if (results[2]) {
+				results[2] = results[2].replace(/\//g, '')
+			}
+			
+			return decodeURIComponent(results[2].replace(/\+/g, ' '));
+		}
+
+		let user = getParameterByName('user')
+
 		const host = 'https://api.spotify.com/'; // Spotify API
 		const endpoint = 'v1/me/player/currently-playing'; // Endpoint
 		const kvNamespace = env.SPOTTY_KV; // KV Namespace
 
-		const token = await kvNamespace.get('access_token')
+		const accessTokenAidan = await kvNamespace.get('access_token_beno');
+		const accessTokenBeno = await kvNamespace.get('access_token_beno');
 
 		let init = {
 			headers: {
@@ -41,7 +63,23 @@ export default {
 			status: 200,
 		}
 
-		const getCurrentlyPlaying = async () => {
+		const getCurrentlyPlaying = async (token: string) => {
+
+			if (user === 'aidan') {
+				let token = accessTokenAidan
+			}
+
+			if (user === 'beno') {
+				let token = accessTokenBeno
+			}
+
+			if (user === null) {
+				init.status = 400
+				return JSON.stringify({
+					response: 'No user specified'
+				})
+			}
+
 			const response = await fetch(`${host}${endpoint}`, {
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -64,6 +102,8 @@ export default {
 				})
 			}
 		}
+
+
 		
 		return new Response(await getCurrentlyPlaying(), init)
 	}
