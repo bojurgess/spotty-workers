@@ -14,6 +14,8 @@ export interface Env {
 
 export default async function refreshAccessTokens(event: any, env: Env, refresh_token: string) {
 
+  console.log(refresh_token)
+
   const init = {
     headers: {
       'content-type': 'application/json;charset=UTF-8',
@@ -52,13 +54,6 @@ export default async function refreshAccessTokens(event: any, env: Env, refresh_
   });
 
   const data: any = await response.json();
-  console.log(
-    data,
-    refresh_token,
-    client_id,
-    client_secret,
-    bytes2base64(bytes)
-  );
 
   return data;
 }

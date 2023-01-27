@@ -45,20 +45,19 @@ function bytes2base64(bytes: Uint8Array) {
 const worker = {  async scheduled(event: any, env: Env, ctx: any) {
 		const kvNamespace = env.SPOTTY_KV;
 
-		const aidanRefreshToken = kvNamespace.get('refresh_token_aidan');
-		const benoAccessToken = kvNamespace.get('access_token_beno');
+		const aidanRefreshToken = await kvNamespace.get('refresh_token_aidan');
+		const benoAccessToken = await kvNamespace.get('access_token_beno');
 
 		function refreshTokens() {
-			return Promise.all([
-				refreshAccessTokens(event, env, aidanRefreshToken),
-				refreshAccessTokens(event, env, benoAccessToken)
-			])
+			refreshAccessTokens(event, env, aidanRefreshToken).then((data) => {
+				kvNamespace.put('access_token_aidan', data.access_token);
+			})
+			refreshAccessTokens(event, env, benoAccessToken).then((data) => {
+				kvNamespace.put('access_token_beno', data.access_token);
+			})
 		}
 
-		const data = await refreshTokens();
-
-		ctx.waitUntil(refreshTokens());  
-		kvNamespace.put('access_token', data.access_token)
+		ctx.waitUntil(refreshTokens());
 		console.log('cron processed', event.scheduledTime);
 	},
 };

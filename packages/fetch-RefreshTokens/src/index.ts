@@ -8,16 +8,24 @@ export interface Env {
 	//
 	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
 	// MY_BUCKET: R2Bucket;
-	REFRESH_TOKEN: string;
 	CLIENT_ID: string;
 	CLIENT_SECRET: string;
 }
 
-import getSpotifyData from 'shared/lib/getSpotifyData'
+import refreshAccessTokens from 'shared/lib/refreshAccessTokens'
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
-    await getSpotifyData(request, env)
+		const aidanRefreshToken = await env.SPOTTY_KV.get('refresh_token_aidan');
+		const benoRefreshToken = await env.SPOTTY_KV.get('refresh_token_beno');
+
+    await refreshAccessTokens(request, env, aidanRefreshToken).then((data) => {
+			env.SPOTTY_KV.put('access_token_aidan', data.access_token);
+		})
+
+		await refreshAccessTokens(request, env, benoRefreshToken).then((data) => {
+			env.SPOTTY_KV.put('access_token_beno', data.access_token);
+		})
 
 		return new Response('Pushed data to KV.')
   },
