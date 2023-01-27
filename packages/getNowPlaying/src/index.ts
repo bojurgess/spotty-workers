@@ -46,8 +46,6 @@ export default {
 			return decodeURIComponent(results[2].replace(/\+/g, ' '));
 		}
 
-		let user = getParameterByName('user')
-
 		const host = 'https://api.spotify.com/'; // Spotify API
 		const endpoint = 'v1/me/player/currently-playing'; // Endpoint
 		const kvNamespace = env.SPOTTY_KV; // KV Namespace
@@ -63,23 +61,27 @@ export default {
 			status: 200,
 		}
 
-		let token
+		const getCurrentlyPlaying = async () => {
 
-		if (user === 'aidan') {
-			token = accessTokenAidan
-		} else if (user === 'beno') {
-			token = accessTokenBeno
-		} else {
-			token = null
-		}
+			let user = getParameterByName('user')
+			console.log(user)
 
-		const getCurrentlyPlaying = async (token: string) => {
+			let token
 
-			if (token === null) {
+			if (user === null) {
 				init.status = 400
 				return JSON.stringify({
 					response: 'No user specified'
 				})
+			} else if (user !== 'aidan' && user !== 'beno') {
+				init.status = 400
+				return JSON.stringify({
+					response: 'Invalid user specified'
+				})
+			} else if (user === 'aidan') {
+				token = accessTokenAidan
+			} else if (user === 'beno') {
+				token = accessTokenBeno
 			}
 
 			const response = await fetch(`${host}${endpoint}`, {
@@ -107,6 +109,6 @@ export default {
 
 
 		
-		return new Response(await getCurrentlyPlaying(token), init)
+		return new Response(await getCurrentlyPlaying(), init)
 	}
 }
