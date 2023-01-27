@@ -63,17 +63,19 @@ export default {
 			status: 200,
 		}
 
+		let token
+
+		if (user === 'aidan') {
+			token = accessTokenAidan
+		} else if (user === 'beno') {
+			token = accessTokenBeno
+		} else {
+			token = null
+		}
+
 		const getCurrentlyPlaying = async (token: string) => {
 
-			if (user === 'aidan') {
-				let token = accessTokenAidan
-			}
-
-			if (user === 'beno') {
-				let token = accessTokenBeno
-			}
-
-			if (user === null) {
+			if (token === null) {
 				init.status = 400
 				return JSON.stringify({
 					response: 'No user specified'
@@ -105,6 +107,6 @@ export default {
 
 
 		
-		return new Response(await getCurrentlyPlaying(), init)
+		return new Response(await getCurrentlyPlaying(token), init)
 	}
 }
