@@ -18,7 +18,8 @@
     "url": "git+https://github.com/bojurgess/spotty-workers.git"
   },
   "scripts": {
-    "test": "node ./__tests__/shared.test.js"
+    "test": "node ./__tests__/shared.test.js",
+    "publish": "wrangler publish"
   },
   "bugs": {
     "url": "https://github.com/bojurgess/spotty-workers/issues"

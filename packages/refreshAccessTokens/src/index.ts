@@ -23,7 +23,7 @@ export interface Env {
 	CLIENT_SECRET: string;
 }
 
-import getSpotifyData from 'shared/lib/getSpotifyData'
+import refreshAccessTokens from 'shared/lib/refreshAccessTokens';
 
 const init = {
 	headers: {
@@ -45,9 +45,19 @@ function bytes2base64(bytes: Uint8Array) {
 const worker = {  async scheduled(event: any, env: Env, ctx: any) {
 		const kvNamespace = env.SPOTTY_KV;
 
-		const data = await getSpotifyData(event, env)
+		const aidanRefreshToken = kvNamespace.get('refresh_token_aidan');
+		const benoAccessToken = kvNamespace.get('access_token_beno');
 
-		ctx.waitUntil(getSpotifyData(event, env));  
+		function refreshTokens() {
+			return Promise.all([
+				refreshAccessTokens(event, env, aidanRefreshToken),
+				refreshAccessTokens(event, env, benoAccessToken)
+			])
+		}
+
+		const data = await refreshTokens();
+
+		ctx.waitUntil(refreshTokens());  
 		kvNamespace.put('access_token', data.access_token)
 		console.log('cron processed', event.scheduledTime);
 	},

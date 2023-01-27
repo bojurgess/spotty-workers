@@ -8,12 +8,11 @@ export interface Env {
 	//
 	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
 	// MY_BUCKET: R2Bucket;
-	REFRESH_TOKEN: string;
 	CLIENT_ID: string;
 	CLIENT_SECRET: string;
 }
 
-export default async function getSpotifyData(event: any, env: Env) {
+export default async function refreshAccessTokens(event: any, env: Env, refresh_token: string) {
 
   const init = {
     headers: {
@@ -36,7 +35,6 @@ export default async function getSpotifyData(event: any, env: Env) {
     CLIENT_ID: client_id,
     CLIENT_SECRET: client_secret,
     SPOTTY_KV: kvNamespace,
-    REFRESH_TOKEN: refresh_token,
   } = env;
 
   let bytes = new TextEncoder().encode(`${client_id}:${client_secret}`);

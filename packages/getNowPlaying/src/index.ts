@@ -50,9 +50,7 @@ export default {
 		
 			if(response.status === 204) {
 				init.status = response.status
-				return JSON.stringify({
-					response: 'nothing playing...'
-				})
+				return
 			} else if (response.status === 200) {
 				const data = await response.json();
 				init.status = response.status
